@@ -44,13 +44,17 @@ class FiberPool
     @fibers,@busy_fibers,@queue,@generic_callbacks = [],{},[],[]
     count.times do |i|
       fiber = Fiber.new do |block|
+        puts "L1"
         loop do
           block.call
+          puts "L2"
           # callbacks are called in a reverse order, much like c++ destructor
           Fiber.current[:callbacks].pop.call while Fiber.current[:callbacks].length > 0
+          puts "L3"
           generic_callbacks.each do |cb|
             cb.call
           end
+          puts "L4"
           unless @queue.empty?
             block = @queue.shift
           else
@@ -58,10 +62,12 @@ class FiberPool
             @fibers.unshift Fiber.current
             block = Fiber.yield
           end
+          puts "L5"
         end
       end
       fiber[:callbacks] = []
       fiber[:em_keys] = []
+      puts "L6"
       @fibers << fiber
     end
   end

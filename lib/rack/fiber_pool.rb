@@ -11,16 +11,23 @@ module Rack
     def initialize(app, options={})
       @app = app
       @fiber_pool = ::FiberPool.new(options[:size] || SIZE)
+      puts "I1"
       yield @fiber_pool if block_given?
+      puts "I2"
     end
 
     def call(env)
+      puts "C1"
       call_app = lambda do
         result = @app.call(env)
         env['async.callback'].call result
       end
+
+      puts "C2"
       
       @fiber_pool.spawn(&call_app)
+
+      puts "C3"
       throw :async
     end
   end
