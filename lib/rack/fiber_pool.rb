@@ -9,6 +9,7 @@ module Rack
     #
     #   use Rack::FiberPool, :size => 25
     def initialize(app, options={})
+      puts "I0"
       @app = app
       @fiber_pool = ::FiberPool.new(options[:size] || SIZE)
       puts "I1"
